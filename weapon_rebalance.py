@@ -9,7 +9,7 @@ weapons = {
   'Kama': {'base_damage': 3.5, 'type':'s', 'size':'s', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 2},
   'Bullets': {'base_damage': 3.5, 'type':'b', 'size':'s', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
   'Light Hammer': {'base_damage': 3.5, 'type':'b', 'size':'s', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
-  'Sling': {'base_damage': 3.5, 'type':'b', 'size':'s', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
+  # 'Sling': {'base_damage': 3.5, 'type':'b', 'size':'s', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
   'Throwing Axes': {'base_damage': 3.5, 'type':'s', 'size':'s', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
   'Handaxe': {'base_damage': 3.5, 'type':'s', 'size':'s', 'crit':4, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
   'Shortsword': {'base_damage': 3.5, 'type':'p', 'size':'s', 'crit':2, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
@@ -18,7 +18,7 @@ weapons = {
   'Light Flail': {'base_damage': 4.5, 'type':'b', 'size':'m', 'crit':3, 'feat': 1, 'is_ugly':2, 'is_monk': 1},
   'Morningstar': {'base_damage': 4.5, 'type':'b/p', 'size':'m', 'crit':3, 'feat': 1, 'is_ugly':2, 'is_monk': 1},
   'Gloves': {'base_damage': 3.5, 'type':'b', 'size':'m', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 2},
-  'Staff': {'base_damage': 3.5, 'type':'b', 'size':'m', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
+  # 'Staff': {'base_damage': 3.5, 'type':'b', 'size':'m', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
   'Double Axe': {'base_damage': 4.5, 'type':'s', 'size':'m', 'crit':4, 'feat': 3, 'is_ugly':1, 'is_monk': 1},
   'Two-Bladed Sword': {'base_damage': 4.5, 'type':'s', 'size':'m', 'crit':2, 'feat': 3, 'is_ugly':1, 'is_monk': 1},
   'Bastard Sword': {'base_damage': 5.5, 'type':'s', 'size':'m', 'crit':2, 'feat': 3, 'is_ugly':1, 'is_monk': 1},
@@ -49,36 +49,36 @@ damage_weights = { #3d12 = 19 | 1d12 + 1d6 == 4d4 2-18 vs 4-16
   '1d4': 2.5,
 }
 
-# damage_type_weights = {
-#     'pure': 1.0,
-#     'magical': .9,
-#     'positive': .8,
-#     'divine': .8,
-#     'negative': .75,
-#     'sonic': .75,
-#     'acid': .75,
-#     'electrical': .65,
-#     'cold': .65,
-#     'fire': .65,
-#     'physical': .65,
-#     'sneak': .5,
-#     'massive': .13
-# }
 damage_type_weights = {
     'pure': 1.0,
-    'magical': 1.0,
-    'positive': 1.0,
-    'divine': 1.0,
-    'negative': 1.0,
-    'sonic': 1.0,
-    'acid': 1.0,
-    'electrical': 1.0,
-    'cold': 1.0,
-    'fire': 1.0,
-    'physical': 1.0,
-    'sneak': 1.0,
-    'massive': 0.0
+    'magical': .9,
+    'positive': .8,
+    'divine': .8,
+    'negative': .75,
+    'sonic': .75,
+    'acid': .75,
+    'electrical': .65,
+    'cold': .65,
+    'fire': .65,
+    'physical': .65,
+    'sneak': .5,
+    'massive': .13
 }
+# damage_type_weights = {
+#     'pure': 1.0,
+#     'magical': 1.0,
+#     'positive': 1.0,
+#     'divine': 1.0,
+#     'negative': 1.0,
+#     'sonic': 1.0,
+#     'acid': 1.0,
+#     'electrical': 1.0,
+#     'cold': 1.0,
+#     'fire': 1.0,
+#     'physical': 1.0,
+#     'sneak': 1.0,
+#     'massive': 0.0
+# }
 weapon_tier_start = {
     'nord': 5.85,
     'green': 5.85,
@@ -245,7 +245,7 @@ new_purple_weapons = {
   'Scimitar': [[7,6, 'physical'],[7,6, 'massive']], # 5% phys immune
   'Rapier': [[2,6, 'physical'],[2,6, 'magical'], [2,6, 'cold'], [0,25, 'massive']], # + pp skill
   'Bullets': [[2,8, 'physical'],[2,6, 'pure'],[2,8, 'fire']], #
-  'Darts': [[0,19, 'pure']], # none
+  'Darts': [[2,12, 'pure'], [2, 6, 'magical']], # none
   'Throwing Axes': [[7,6, 'sonic'], [1,6, 'massive']], # silence on hit
   'Light Hammer': [[2,10, 'physical'],[2,12, 'cold'], [1,6, 'magical']], # 10% cold 10/ cold
   'Handaxe': [[2,6, 'physical'],[2,6, 'negative'], [2,8, 'acid']], # 10% acid immune, on hit poison 
@@ -290,7 +290,7 @@ new_purple_weapons_property = {
   'Scimitar': [[7,6, 'physical'],[7,6, 'massive']], # 5% phys immune
   'Rapier': [[2,6, 'physical'],[2,6, 'magical'], [2,6, 'cold'], [0,25, 'massive']], # + pp skill
   'Bullets': [[2,8, 'physical'],[2,6, 'pure'],[2,8, 'fire']], #
-  'Darts': [[0,19, 'pure'], [0, 1.2, 'pure']], # none
+  'Darts': [[2,12, 'pure'], [2, 6, 'magical'], [0, 1.2, 'pure']], # none
   'Throwing Axes': [[7,6, 'sonic'], [1,6, 'massive']], # silence on hit
   'Light Hammer': [[2,10, 'physical'],[2,12, 'cold'], [1,6, 'magical']], # 10% cold 10/ cold
   'Handaxe': [[2,6, 'physical'],[2,6, 'negative'], [2,8, 'acid'], [0, .35, 'acid'], [0, .35, 'pure']], # 10% acid immune, on hit poison 
