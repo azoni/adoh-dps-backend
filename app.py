@@ -1,4 +1,4 @@
-from flask import Flask, Markup
+from flask import Flask
 from flask_cors import CORS
 import weapon_rebalance
 
