@@ -26,7 +26,9 @@ def calculate_damage():
     data = request.get_json()  # Receive the JSON payload sent from the React frontend
     immunities = data.get('immunities', [])
     resists = data.get('resists', [])
-
+    print(data)
+    print(immunities)
+    print(resists)
     total_damage = 0  # Initialize total damage
 
     # Calculate damage based on immunities and resists
@@ -35,7 +37,7 @@ def calculate_damage():
         
         immunity = next((immunity['value'] for immunity in immunities if immunity['type'] == weapon_type), None)
         resist = next((resist['value'] for resist in resists if resist['type'] == weapon_type), None)
-
+        
         # Apply immunities and resists
         if immunity:
             damage_after_immunity = max(base_damage - float(immunity), 0)
@@ -53,21 +55,10 @@ def calculate_damage():
 
 @app.route('/')
 def home():
-    output = "<ul>"  # Start an unordered list
-    
-    # for weapon in sorted(weapon_rebalance.weapons):
-    #     output += f"<li><strong>{weapon}</strong>: <br> Damage - {round(weapon_rebalance.weapons[weapon]['target_damage'], 2)}<br>"  # Weapon name and damage
-        
-    #     if weapon in weapon_rebalance.new_purple_weapons:  # Check if weapon has properties
-    #         output += "<ul>"  # Start a nested list for properties
-    #         for property in weapon_rebalance.new_purple_weapons[weapon]:
-    #             output += f"<li>{property}</li>"  # List each property
-    #         output += "</ul>"  # End nested list
-            
-    #     output += "</li><br>"  # End weapon list item
-        
-    # output += "</ul>"  # End main list
-    return jsonify(weapon_rebalance.weapons)
+    try:
+        return jsonify(weapon_rebalance.weapons)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500  # Return a JSON error response
 
 if __name__ == '__main__':
     app.run(debug=True)

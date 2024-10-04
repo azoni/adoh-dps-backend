@@ -1,9 +1,9 @@
 weapons = {
   'Shuriken': {'base_damage': 2, 'type':'p', 'size':'t', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 2},
-  'Darts': {'base_damage': 2.5, 'type':'p', 'size':'t', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
+  'Darts': {'base_damage': 2.5, 'type':'p', 'size':'t', 'crit':3, 'feat': 2, 'is_ugly':1, 'is_monk': 1},
   'Kukri': {'base_damage': 2.5, 'type':'s', 'size':'t', 'crit':1, 'feat': 3, 'is_ugly':1, 'is_monk': 1},
   'Dagger': {'base_damage': 2.5, 'type':'p', 'size':'t', 'crit':2, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
-  'Mace': {'base_damage': 3.5, 'type':'b', 'size':'s', 'crit':3, 'feat': 1, 'is_ugly':2, 'is_monk': 1},
+  'Mace': {'base_damage': 3.5, 'type':'b', 'size':'s', 'crit':3, 'feat': 2, 'is_ugly':2, 'is_monk': 1},
   'Sickle': {'base_damage': 3.5, 'type':'s', 'size':'s', 'crit':3, 'feat': 1, 'is_ugly':2, 'is_monk': 1},
   'Whip': {'base_damage': 3.5, 'type':'s', 'size':'s', 'crit':3, 'feat': 3, 'is_ugly':1, 'is_monk': 1},
   'Kama': {'base_damage': 3.5, 'type':'s', 'size':'s', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 2},
@@ -14,7 +14,7 @@ weapons = {
   'Handaxe': {'base_damage': 3.5, 'type':'s', 'size':'s', 'crit':4, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
   'Shortsword': {'base_damage': 3.5, 'type':'p', 'size':'s', 'crit':2, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
   'Dire Mace': {'base_damage': 4.5, 'type':'b', 'size':'m', 'crit':3, 'feat': 3, 'is_ugly':1, 'is_monk': 1},
-  'Club': {'base_damage': 3.5, 'type':'b', 'size':'m', 'crit':3, 'feat': 1, 'is_ugly':2, 'is_monk': 1},
+  'Club': {'base_damage': 3.5, 'type':'b', 'size':'m', 'crit':3, 'feat': 2, 'is_ugly':2, 'is_monk': 1},
   'Light Flail': {'base_damage': 4.5, 'type':'b', 'size':'m', 'crit':3, 'feat': 1, 'is_ugly':2, 'is_monk': 1},
   'Morningstar': {'base_damage': 4.5, 'type':'b/p', 'size':'m', 'crit':3, 'feat': 1, 'is_ugly':2, 'is_monk': 1},
   'Gloves': {'base_damage': 3.5, 'type':'b', 'size':'m', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 2},
@@ -39,6 +39,8 @@ weapons = {
   'Heavy Flail': {'base_damage': 5.5, 'type':'b', 'size':'l', 'crit':2, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
   'Spear': {'base_damage': 4.5, 'type':'p', 'size':'l', 'crit':4, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
   'Scythe': {'base_damage': 5, 'type':'s/p', 'size':'l', 'crit':5, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
+  'Phase Killer': {'base_damage': 2.5, 'type':'p', 'size':'t', 'crit':2, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
+  'Ahrimans Halberd of Sacrifice': {'base_damage': 5.5, 'type':'s/p', 'size':'l', 'crit':4, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
 }
 
 damage_weights = { #3d12 = 19 | 1d12 + 1d6 == 4d4 2-18 vs 4-16
@@ -91,8 +93,8 @@ weapon_feat_weights = {
     3: 1.05
 }
 weapon_feats = {
-    1: 'simple',
-    2: 'martial',
+    1: 'martial',
+    2: 'simple',
     3: 'exotic'
 }
 weapon_size_weights = {
@@ -199,6 +201,7 @@ def calculate_damage(weapon, properties, include_critical = False, is_keen = Fal
       damage += crit_damage
     decrease = 1 - weapon['target_damage']/damage
 
+    weapons[weapon_name]['crit'] = str(weapon_crit_damage[weapons[weapon_name]['crit']][0]) + "-20 /x" + str(weapon_crit_damage[weapons[weapon_name]['crit']][1])
     weapons[weapon_name]['damage'] = round(damage, 2)
     weapons[weapon_name]['over'] = round(decrease * 100, 2)
     # print(f"{weapon_name:<18}", f"{damage:.2f}", "  Target ", f"{round(weapon['target_damage'], 2):.2f}", ' Potential ', int(potential), '  Over ', f"{decrease * 100:.2f}%")
@@ -253,7 +256,7 @@ new_purple_weapons = {
   'Spear': [[2,6, 'acid'],[2,6, 'cold'],[2,6, 'fire'], [2,6, 'electrical'], [2,8, 'physical']], # freedom
   'Heavy Flail': [[2,10, 'physical'],[2,6, 'negative'],[2,6, 'divine'], [2,6, 'magical']], # None
   'Greataxe': [[2,12, 'physical'], [2,8, 'divine'], [2,12, 'fire']], # vs Undead, immune level drain
-  'Halberd': [[2,6, 'sneak'], [2,12, 'physical'], [0,125, 'massive']], # Ahrim's Sacrifice, hold on hit, 43
+  'Ahrimans Halberd of Sacrifice': [[2,6, 'sneak'], [2,12, 'physical'], [0,140, 'massive']], # Ahrim's Sacrifice, hold on hit, 43
   #'Greatsword': [[2,12, 'physical'], [2,8, 'divine'], [2,8, 'fire'], [2,12, 'massive']], # deserts light
   'Greatsword': [[2,12, 'physical'], [2,12, 'divine'], [2,6, 'fire']], # tyr 48, lesser 54/58
   'Dire Mace': [[8,6, 'physical'],[2,6, 'magical']], # 10% phys immune
@@ -286,8 +289,8 @@ new_purple_weapons = {
   'Handaxe': [[2,6, 'physical'],[2,6, 'negative'], [2,8, 'acid']], # 10% acid immune, on hit poison 
   'Shortsword': [[2,6, 'physical'],[2,6, 'acid'], [2,6, 'negative'], [2,12, 'massive']], # regen/vampiric
   #'Shortsword': [[2,6, 'physical'],[2,6, 'sonic'], [2,6, 'pure']],
-  #'Dagger': [[2,6, 'physical'],[2,4, 'divine'],[2,4, 'acid'], [2,4, 'pure']], # none
-  'Dagger': [[2,6, 'physical'],[2,6, 'negative'], [0,60, 'massive']],
+  'Dagger': [[2,6, 'physical'],[2,4, 'divine'],[2,4, 'acid'], [2,4, 'pure']], # none
+  'Phase Killer': [[2,6, 'physical'],[2,6, 'negative'], [0,60, 'massive']],
   'Shuriken': [[2,6, 'physical'], [2,6, 'sneak'], [2,4, 'negative'], [2,4, 'pure']], # none
   'Kama': [[2,6, 'physical'],[2,6, 'divine'],[2,6, 'positive'], [1,6, 'massive']], # 4 regen
   'Kukri': [[2,6, 'physical'],[2,6, 'divine'],[2,6, 'magical']] # dmg vs alignment
