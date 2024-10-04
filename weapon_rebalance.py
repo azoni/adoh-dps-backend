@@ -22,7 +22,7 @@ weapons = {
   'Double Axe': {'base_damage': 4.5, 'type':'s', 'size':'m', 'crit':4, 'feat': 3, 'is_ugly':1, 'is_monk': 1},
   'Two-Bladed Sword': {'base_damage': 4.5, 'type':'s', 'size':'m', 'crit':2, 'feat': 3, 'is_ugly':1, 'is_monk': 1},
   'Bastard Sword': {'base_damage': 5.5, 'type':'s', 'size':'m', 'crit':2, 'feat': 3, 'is_ugly':1, 'is_monk': 1},
-  'Bolts': {'base_damage': 4.5, 'type':'p', 'size':'m', 'crit':4, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
+  'Bolts': {'base_damage': 4.5, 'type':'p', 'size':'m', 'crit':1, 'feat': 1, 'is_ugly':1, 'is_monk': 1},
   'Dwarven Waraxe': {'base_damage': 5.5, 'type':'s', 'size':'m', 'crit':4, 'feat': 3, 'is_ugly':1, 'is_monk': 1},
   'Katana': {'base_damage': 5.5, 'type':'s', 'size':'m', 'crit':2, 'feat': 3, 'is_ugly':1, 'is_monk': 1},
   'Quarterstaff': {'base_damage': 3.5, 'type':'b', 'size':'l', 'crit':3, 'feat': 1, 'is_ugly':1, 'is_monk': 2},
@@ -77,7 +77,7 @@ damage_type_weights = {
 #     'fire': 1.0,
 #     'physical': 1.0,
 #     'sneak': 1.0,
-#     'massive': 0.0
+#     'massive': 1.0
 # }
 weapon_tier_start = {
     'nord': 5.85,
@@ -89,6 +89,11 @@ weapon_feat_weights = {
     1: 1,
     2: 1,
     3: 1.05
+}
+weapon_feats = {
+    1: 'simple',
+    2: 'martial',
+    3: 'exotic'
 }
 weapon_size_weights = {
     'l': 1.15,
@@ -103,6 +108,13 @@ weapon_crit_weights = {
     3: 1.08,
     4: 1,
     5: .92,
+}
+weapon_crit_damage = {
+  1: [18, 2],
+  2: [19, 2],
+  3: [20, 2],
+  4: [20, 3],
+  5: [20, 4],
 }
 weapon_ugly_weights = {
     1: 1,
@@ -132,7 +144,9 @@ def generate_weapon_damage(tier):
     weapon_damage *= weapon_feat_weights[weapon_info['feat']]
     weapon_damage *= weapon_monk_weights[weapon_info['is_monk']]
 
-    weapon_info['weapon_damage'] = weapon_damage
+    weapon_info['feat'] =  weapon_feats[weapon_info['feat']]
+    
+    weapon_info['target_damage'] = round(weapon_damage, 2)
     key = f"{weapon_damage:.2f}"
     if key not in weapon_damage_dict:
       weapon_damage_dict[key] = [weapon]
@@ -141,32 +155,53 @@ def generate_weapon_damage(tier):
     #print(f"{weapon:<18}", f"{weapon_damage:.2f}")
   weapon_damage_dict = {key: weapon_damage_dict[key] for key in sorted(weapon_damage_dict)}
 
-def calculate_damage(weapon, properties):
+def calculate_damage(weapon, properties, include_critical = False, is_keen = False, is_imp_crit = False, crit_immune = False):
     weapon_name = weapon
     weapon = weapons[weapon]
 
     damage = (10 + weapon['base_damage']) * damage_type_weights['physical']
     # Off by 1 for greatersword. 7 * 2 - 1 = 13 not 12 :(
     potential = 10 + (weapon['base_damage'] * 2) -1
-
+    if include_critical and crit_immune:
+      include_critical = False
     for property in properties:
       dice1 = property[0]
       dice2 = property[1]
       damage_type = property[2]
-      
+      crit_range = 20 - weapon_crit_damage[weapons[weapon_name]['crit']][0] + 1
+      crit_multi = weapon_crit_damage[weapons[weapon_name]['crit']][1]
+      temp = crit_range
+      if is_keen:
+        crit_range += temp
+      if is_imp_crit:
+        crit_range += temp
+      if crit_immune and damage_type == 'massive':
+        continue
       if dice1 == 0:
-        if damage_type != "massive":
+        if damage_type == 'massive':
+          type_damage = (dice2  * (.05 * crit_range)) * damage_type_weights['physical']
+        else:
           potential += dice2
-        type_damage = dice2 * damage_type_weights[damage_type]
+          type_damage = dice2 * damage_type_weights[damage_type]
       else:
-        if damage_type != "massive":
+        if damage_type == 'massive':
+          type_damage = ((dice1 * dice2 - dice1) / 2 + dice1) * (.05 * crit_range) * damage_type_weights['physical']
+        else:
           potential += dice2 * dice1
-        type_damage = ((dice1 * dice2 - dice1) / 2 + dice1) * damage_type_weights[damage_type]
+          type_damage = ((dice1 * dice2 - dice1) / 2 + dice1) * damage_type_weights[damage_type]
+
       damage += type_damage
       #print(str(dice1) + 'd' + str(dice2) ,property[2], round(type_damage, 2))
-    decrease = 1 - weapon['weapon_damage']/damage
+    
+    if include_critical:
+      crit_damage = (damage * (crit_multi - 1)) * (.05 * crit_range)
+      # print(crit_range, f"{crit_damage:.2f}", f"{damage:.2f}")
+      damage += crit_damage
+    decrease = 1 - weapon['target_damage']/damage
 
-    print(f"{weapon_name:<18}", f"{damage:.2f}", "  Target ", f"{round(weapon['weapon_damage'], 2):.2f}", ' Potential ', int(potential), '  Over ', f"{decrease * 100:.2f}%")
+    weapons[weapon_name]['damage'] = round(damage, 2)
+    weapons[weapon_name]['over'] = round(decrease * 100, 2)
+    # print(f"{weapon_name:<18}", f"{damage:.2f}", "  Target ", f"{round(weapon['target_damage'], 2):.2f}", ' Potential ', int(potential), '  Over ', f"{decrease * 100:.2f}%")
 
 purple_weapons = {
   'Trident': [[2,8, 'physical'],[9,6, 'fire'], [2,8, 'magical'], [2,8, 'negative'], [2,8, 'massive']],
@@ -218,9 +253,9 @@ new_purple_weapons = {
   'Spear': [[2,6, 'acid'],[2,6, 'cold'],[2,6, 'fire'], [2,6, 'electrical'], [2,8, 'physical']], # freedom
   'Heavy Flail': [[2,10, 'physical'],[2,6, 'negative'],[2,6, 'divine'], [2,6, 'magical']], # None
   'Greataxe': [[2,12, 'physical'], [2,8, 'divine'], [2,12, 'fire']], # vs Undead, immune level drain
-  'Halberd': [[2,6, 'sneak'], [2,12, 'physical'], [0,100, 'massive']], # Ahrim's Sacrifice, hold on hit, 43
-  'Greatsword': [[2,12, 'physical'], [2,8, 'divine'], [2,8, 'fire'], [2,12, 'massive']], # deserts light
-  #'Greatsword': [[2,12, 'physical'], [2,12, 'divine'], [2,6, 'fire']], # tyr 48, lesser 54/58
+  'Halberd': [[2,6, 'sneak'], [2,12, 'physical'], [0,125, 'massive']], # Ahrim's Sacrifice, hold on hit, 43
+  #'Greatsword': [[2,12, 'physical'], [2,8, 'divine'], [2,8, 'fire'], [2,12, 'massive']], # deserts light
+  'Greatsword': [[2,12, 'physical'], [2,12, 'divine'], [2,6, 'fire']], # tyr 48, lesser 54/58
   'Dire Mace': [[8,6, 'physical'],[2,6, 'magical']], # 10% phys immune
   'Club': [[2,10, 'physical'],[7,6, 'acid']], # acid resist 20, immune level drain
   'Morningstar': [[2,6, 'physical'],[7,6, 'positive'], [1,6, 'massive']], # divine extend, 15% pos immune
@@ -251,8 +286,8 @@ new_purple_weapons = {
   'Handaxe': [[2,6, 'physical'],[2,6, 'negative'], [2,8, 'acid']], # 10% acid immune, on hit poison 
   'Shortsword': [[2,6, 'physical'],[2,6, 'acid'], [2,6, 'negative'], [2,12, 'massive']], # regen/vampiric
   #'Shortsword': [[2,6, 'physical'],[2,6, 'sonic'], [2,6, 'pure']],
-  'Dagger': [[2,6, 'physical'],[2,4, 'divine'],[2,4, 'acid'], [2,4, 'pure']], # none
-  #'Dagger': [[2,6, 'physical'],[2,6, 'negative'], [0,60, 'massive']],
+  #'Dagger': [[2,6, 'physical'],[2,4, 'divine'],[2,4, 'acid'], [2,4, 'pure']], # none
+  'Dagger': [[2,6, 'physical'],[2,6, 'negative'], [0,60, 'massive']],
   'Shuriken': [[2,6, 'physical'], [2,6, 'sneak'], [2,4, 'negative'], [2,4, 'pure']], # none
   'Kama': [[2,6, 'physical'],[2,6, 'divine'],[2,6, 'positive'], [1,6, 'massive']], # 4 regen
   'Kukri': [[2,6, 'physical'],[2,6, 'divine'],[2,6, 'magical']] # dmg vs alignment
@@ -296,8 +331,8 @@ new_purple_weapons_property = {
   'Handaxe': [[2,6, 'physical'],[2,6, 'negative'], [2,8, 'acid'], [0, .35, 'acid'], [0, .35, 'pure']], # 10% acid immune, on hit poison 
   'Shortsword': [[2,6, 'physical'],[2,6, 'acid'], [2,6, 'negative'], [2,12, 'massive']], # regen/vampiric
   #'Shortsword': [[2,6, 'physical'],[2,6, 'sonic'], [2,6, 'pure']],
-  'Dagger': [[2,6, 'physical'],[2,4, 'divine'],[2,4, 'acid'], [2,4, 'pure'], [0, 3, 'physical']], # none
-  #'Dagger': [[2,6, 'physical'],[2,6, 'negative'], [0,60, 'massive']],
+  #'Dagger': [[2,6, 'physical'],[2,4, 'divine'],[2,4, 'acid'], [2,4, 'pure'], [0, 3, 'physical']], # none
+  'Dagger': [[2,6, 'physical'],[2,6, 'negative'], [0,60, 'massive']],
   'Shuriken': [[2,6, 'physical'], [2,6, 'sneak'], [2,4, 'negative'], [2,4, 'pure']], # none
   'Kama': [[2,6, 'physical'],[2,6, 'divine'],[2,6, 'positive'], [1,6, 'massive']], # 4 regen
   'Kukri': [[2,6, 'physical'],[2,6, 'divine'],[2,6, 'magical'], [1, 4, 'positive']] # dmg vs alignment
@@ -306,14 +341,20 @@ new_purple_weapons_property = {
 generate_weapon_damage('purple')
 for weapon in new_purple_weapons:
   #calculate_damage(weapon, purple_weapons[weapon])
-  calculate_damage(weapon, new_purple_weapons[weapon])
-  #calculate_damage(weapon, new_purple_weapons_property[weapon])
+  calculate_damage(weapon, new_purple_weapons[weapon], False, True, True, False)
+  weapon_properties = []
 
-# # Uncomment to print each weapon with their damage types.
-# for weapon in list(sorted(new_purple_weapons)):
-#   print(weapon)
-#   for property in new_purple_weapons[weapon]:
-#     print(property)
-#   print()
+  for property in new_purple_weapons[weapon]:
+    weapon_properties.append(str(property[0]) + 'D' + str(property[1]) + " " + property[2])
+  
+  weapons[weapon]['properties'] = weapon_properties
+  #calculate_damage(weapon, new_purple_weapons_property[weapon], False, True, True, True)
+
+# # Uncomment to print each weapon with their damage types. 
+# for weapon in dict(sorted(weapons.items(), key = lambda x: x[1]["damage"], reverse=True)):
+#   print(f"{weapon:<18}", "Damage:",f"{weapons[weapon]['damage']:.2f}", "Target:", f"{weapons[weapon]['target_damage']:.2f}", "Over:", f"{100 *(1 - weapons[weapon]['target_damage']/weapons[weapon]['damage']):.2f}%")
+#   # for property in new_purple_weapons[weapon]:
+#   #   print(property)
+#   # print()
 
 
