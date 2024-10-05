@@ -51,36 +51,36 @@ damage_weights = { #3d12 = 19 | 1d12 + 1d6 == 4d4 2-18 vs 4-16
   '1d4': 2.5,
 }
 
-damage_type_weights = {
-    'pure': 1.0,
-    'magical': .9,
-    'positive': .8,
-    'divine': .8,
-    'negative': .75,
-    'sonic': .75,
-    'acid': .75,
-    'electrical': .65,
-    'cold': .65,
-    'fire': .65,
-    'physical': .65,
-    'sneak': .5,
-    'massive': .13
-}
 # damage_type_weights = {
 #     'pure': 1.0,
-#     'magical': 1.0,
-#     'positive': 1.0,
-#     'divine': 1.0,
-#     'negative': 1.0,
-#     'sonic': 1.0,
-#     'acid': 1.0,
-#     'electrical': 1.0,
-#     'cold': 1.0,
-#     'fire': 1.0,
-#     'physical': 1.0,
-#     'sneak': 1.0,
-#     'massive': 1.0
+#     'magical': .9,
+#     'positive': .8,
+#     'divine': .8,
+#     'negative': .75,
+#     'sonic': .75,
+#     'acid': .75,
+#     'electrical': .65,
+#     'cold': .65,
+#     'fire': .65,
+#     'physical': .65,
+#     'sneak': .5,
+#     'massive': .13
 # }
+damage_type_weights = {
+    'pure': 1.0,
+    'magical': 1.0,
+    'positive': 1.0,
+    'divine': 1.0,
+    'negative': 1.0,
+    'sonic': 1.0,
+    'acid': 1.0,
+    'electrical': 1.0,
+    'cold': 1.0,
+    'fire': 1.0,
+    'physical': 1.0,
+    'sneak': 1.0,
+    'massive': 1.0
+}
 weapon_tier_start = {
     'nord': 5.85,
     'green': 5.85,
@@ -157,7 +157,7 @@ def generate_weapon_damage(tier):
     #print(f"{weapon:<18}", f"{weapon_damage:.2f}")
   weapon_damage_dict = {key: weapon_damage_dict[key] for key in sorted(weapon_damage_dict)}
 
-def calculate_damage(weapon, properties, include_critical = False, is_keen = False, is_imp_crit = False, crit_immune = False):
+def calculate_damage(weapon, properties, include_critical = False, is_keen = False, is_imp_crit = False, crit_immune = False, sneak_immune = False):
     weapon_name = weapon
     weapon = weapons[weapon]
 
@@ -170,6 +170,8 @@ def calculate_damage(weapon, properties, include_critical = False, is_keen = Fal
       dice1 = property[0]
       dice2 = property[1]
       damage_type = property[2]
+      if sneak_immune and damage_type == 'sneak':
+        continue
       crit_range = 20 - weapon_crit_damage[weapons[weapon_name]['crit']][0] + 1
       crit_multi = weapon_crit_damage[weapons[weapon_name]['crit']][1]
       temp = crit_range
@@ -201,7 +203,7 @@ def calculate_damage(weapon, properties, include_critical = False, is_keen = Fal
       damage += crit_damage
     decrease = 1 - weapon['target_damage']/damage
 
-    weapons[weapon_name]['crit'] = str(weapon_crit_damage[weapons[weapon_name]['crit']][0]) + "-20 /x" + str(weapon_crit_damage[weapons[weapon_name]['crit']][1])
+    #weapons[weapon_name]['crit'] = str(weapon_crit_damage[weapons[weapon_name]['crit']][0]) + "-20 /x" + str(weapon_crit_damage[weapons[weapon_name]['crit']][1])
     weapons[weapon_name]['damage'] = round(damage, 2)
     weapons[weapon_name]['over'] = round(decrease * 100, 2)
     # print(f"{weapon_name:<18}", f"{damage:.2f}", "  Target ", f"{round(weapon['target_damage'], 2):.2f}", ' Potential ', int(potential), '  Over ', f"{decrease * 100:.2f}%")
