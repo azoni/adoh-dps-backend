@@ -15,8 +15,7 @@ def calculate_damage():
     ac = data.get('armorClass')
     is_crit_immune = data.get('criticalHitImmunity')
     is_sneak_immune = data.get('sneakAttackImmunity')
-    if not weapon:
-        return "No Weapon Selected"
+
     print(immunities)
     print(resists)
     print(weapon)
@@ -32,11 +31,9 @@ def calculate_damage():
     weapon_rebalance.damage_type_weights['divine'] = (100 - int(immunities[8]['value'])) / 100
     weapon_rebalance.damage_type_weights['magical'] = (100 - int(immunities[9]['value'])) / 100
     weapon_rebalance.damage_type_weights['pure'] = (100 - int(immunities[10]['value'])) / 100
-    
+
     for w in weapon_rebalance.new_purple_weapons:
         weapon_rebalance.calculate_damage(w, weapon_rebalance.new_purple_weapons[w], True, player['keen'], player["Imp Crit"], is_crit_immune, is_sneak_immune)
-    print(weapon_rebalance.weapons[weapon]['damage'])
-
 
     return jsonify({'damage': weapon_rebalance.weapons})
 

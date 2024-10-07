@@ -51,36 +51,36 @@ damage_weights = { #3d12 = 19 | 1d12 + 1d6 == 4d4 2-18 vs 4-16
   '1d4': 2.5,
 }
 
-# damage_type_weights = {
-#     'pure': 1.0,
-#     'magical': .9,
-#     'positive': .8,
-#     'divine': .8,
-#     'negative': .75,
-#     'sonic': .75,
-#     'acid': .75,
-#     'electrical': .65,
-#     'cold': .65,
-#     'fire': .65,
-#     'physical': .65,
-#     'sneak': .5,
-#     'massive': .13
-# }
 damage_type_weights = {
     'pure': 1.0,
-    'magical': 1.0,
-    'positive': 1.0,
-    'divine': 1.0,
-    'negative': 1.0,
-    'sonic': 1.0,
-    'acid': 1.0,
-    'electrical': 1.0,
-    'cold': 1.0,
-    'fire': 1.0,
-    'physical': 1.0,
-    'sneak': 1.0,
-    'massive': 1.0
+    'magical': .9,
+    'positive': .9,
+    'divine': .9,
+    'negative': .75,
+    'sonic': .75,
+    'acid': .75,
+    'electrical': .75,
+    'cold': .75,
+    'fire': .75,
+    'physical': .75,
+    'sneak': .5,
+    'massive': .13
 }
+# damage_type_weights = {
+#     'pure': 1.0,
+#     'magical': 1.0,
+#     'positive': 1.0,
+#     'divine': 1.0,
+#     'negative': 1.0,
+#     'sonic': 1.0,
+#     'acid': 1.0,
+#     'electrical': 1.0,
+#     'cold': 1.0,
+#     'fire': 1.0,
+#     'physical': 1.0,
+#     'sneak': 1.0,
+#     'massive': 1.0
+# }
 weapon_tier_start = {
     'nord': 5.85,
     'green': 5.85,
@@ -160,7 +160,7 @@ def generate_weapon_damage(tier):
 def calculate_damage(weapon, properties, include_critical = False, is_keen = False, is_imp_crit = False, crit_immune = False, sneak_immune = False):
     weapon_name = weapon
     weapon = weapons[weapon]
-
+    sneak_damage = 0
     damage = (10 + weapon['base_damage']) * damage_type_weights['physical']
     # Off by 1 for greatersword. 7 * 2 - 1 = 13 not 12 :(
     potential = 10 + (weapon['base_damage'] * 2) -1
@@ -181,6 +181,7 @@ def calculate_damage(weapon, properties, include_critical = False, is_keen = Fal
         crit_range += temp
       if crit_immune and damage_type == 'massive':
         continue
+      type_damage = 0
       if dice1 == 0:
         if damage_type == 'massive':
           type_damage = (dice2  * (.05 * crit_range)) * damage_type_weights['physical']
@@ -191,7 +192,7 @@ def calculate_damage(weapon, properties, include_critical = False, is_keen = Fal
         if damage_type == 'massive':
           type_damage = ((dice1 * dice2 - dice1) / 2 + dice1) * (.05 * crit_range) * damage_type_weights['physical']
         elif damage_type == 'sneak':
-          type_damage = ((dice1 * dice2 - dice1) / 2 + dice1) * damage_type_weights['physical']
+          sneak_damage = ((dice1 * dice2 - dice1) / 2 + dice1) * damage_type_weights['physical']
         else:
           potential += dice2 * dice1
           type_damage = ((dice1 * dice2 - dice1) / 2 + dice1) * damage_type_weights[damage_type]
@@ -203,8 +204,9 @@ def calculate_damage(weapon, properties, include_critical = False, is_keen = Fal
       crit_damage = (damage * (crit_multi - 1)) * (.05 * crit_range)
       # print(crit_range, f"{crit_damage:.2f}", f"{damage:.2f}")
       damage += crit_damage
-    decrease = 1 - weapon['target_damage']/damage
-
+    if damage != 0:
+      decrease = 1 - weapon['target_damage']/damage
+    damage += sneak_damage
     #weapons[weapon_name]['crit'] = str(weapon_crit_damage[weapons[weapon_name]['crit']][0]) + "-20 /x" + str(weapon_crit_damage[weapons[weapon_name]['crit']][1])
     weapons[weapon_name]['damage'] = round(damage, 2)
     weapons[weapon_name]['over'] = round(decrease * 100, 2)
@@ -260,9 +262,9 @@ new_purple_weapons = {
   'Spear': [[2,6, 'acid'],[2,6, 'cold'],[2,6, 'fire'], [2,6, 'electrical'], [2,8, 'physical']], # freedom
   'Heavy Flail': [[2,10, 'physical'],[2,6, 'negative'],[2,6, 'divine'], [2,6, 'magical']], # None
   'Greataxe': [[2,12, 'physical'], [2,8, 'divine'], [2,12, 'fire']], # vs Undead, immune level drain
-  'Ahrimans Halberd of Sacrifice': [[2,6, 'sneak'], [2,12, 'physical'], [0,140, 'massive']], # Ahrim's Sacrifice, hold on hit, 43
-  #'Greatsword': [[2,12, 'physical'], [2,8, 'divine'], [2,8, 'fire'], [2,12, 'massive']], # deserts light
-  'Greatsword': [[2,12, 'physical'], [2,12, 'divine'], [2,6, 'fire']], # tyr 48, lesser 54/58
+  'Ahrimans Halberd of Sacrifice': [[2,6, 'sneak'], [2,12, 'physical'], [0,200, 'massive']], # Ahrim's Sacrifice, hold on hit, 43
+  'Greatsword': [[2,12, 'physical'], [2,8, 'divine'], [2,8, 'fire'], [2,12, 'massive']], # deserts light
+  #'Greatsword': [[2,12, 'physical'], [2,12, 'divine'], [2,6, 'fire']], # tyr 48, lesser 54/58
   'Dire Mace': [[8,6, 'physical'],[2,6, 'magical']], # 10% phys immune
   'Club': [[2,10, 'physical'],[7,6, 'acid']], # acid resist 20, immune level drain
   'Morningstar': [[2,6, 'physical'],[7,6, 'positive'], [1,6, 'massive']], # divine extend, 15% pos immune
@@ -291,8 +293,8 @@ new_purple_weapons = {
   'Throwing Axes': [[7,6, 'sonic'], [1,6, 'massive']], # silence on hit
   'Light Hammer': [[2,10, 'physical'],[2,12, 'cold'], [1,6, 'magical']], # 10% cold 10/ cold
   'Handaxe': [[2,6, 'physical'],[2,6, 'negative'], [2,8, 'acid']], # 10% acid immune, on hit poison 
-  'Shortsword': [[2,6, 'physical'],[2,6, 'acid'], [2,6, 'negative'], [2,12, 'massive']], # regen/vampiric
-  #'Shortsword': [[2,6, 'physical'],[2,6, 'sonic'], [2,6, 'pure']],
+  #'Shortsword': [[2,6, 'physical'],[2,6, 'acid'], [2,6, 'negative'], [2,12, 'massive']], # regen/vampiric
+  'Shortsword': [[2,6, 'physical'],[2,6, 'sonic'], [2,6, 'pure'], [1, 6, 'sneak']],
   'Dagger': [[2,6, 'physical'],[2,4, 'divine'],[2,4, 'acid'], [2,4, 'pure']], # none
   'Phase Killer': [[2,6, 'physical'],[2,6, 'negative'], [0,60, 'massive']],
   'Shuriken': [[2,6, 'physical'], [2,6, 'sneak'], [2,4, 'negative'], [2,4, 'pure']], # none
@@ -348,7 +350,7 @@ new_purple_weapons_property = {
 generate_weapon_damage('purple')
 for weapon in new_purple_weapons:
   #calculate_damage(weapon, purple_weapons[weapon])
-  calculate_damage(weapon, new_purple_weapons[weapon], False, True, True, False)
+  calculate_damage(weapon, new_purple_weapons[weapon], True, True, True, False)
   weapon_properties = []
 
   for property in new_purple_weapons[weapon]:
