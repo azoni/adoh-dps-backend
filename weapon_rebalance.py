@@ -190,6 +190,8 @@ def calculate_damage(weapon, properties, include_critical = False, is_keen = Fal
       else:
         if damage_type == 'massive':
           type_damage = ((dice1 * dice2 - dice1) / 2 + dice1) * (.05 * crit_range) * damage_type_weights['physical']
+        elif damage_type == 'sneak':
+          type_damage = ((dice1 * dice2 - dice1) / 2 + dice1) * damage_type_weights['physical']
         else:
           potential += dice2 * dice1
           type_damage = ((dice1 * dice2 - dice1) / 2 + dice1) * damage_type_weights[damage_type]
@@ -268,7 +270,7 @@ new_purple_weapons = {
   'Quarterstaff': [[2,10, 'physical'],[2,12, 'cold'],[2,12, 'fire']], # 10% fire/cold immune
   'Scythe': [[0,10, 'physical'], [2,10, 'physical'], [2,8, 'negative']], # 43
   'Dwarven Waraxe': [[2,8, 'physical'], [2,10, 'acid'], [2,8, 'negative']], # vs Dragons
-  'Bastard Sword': [[2,6, 'physical'], [2,6, 'divine'], [2,6, 'magical'], [2,6, 'negative']], # None
+  'Bastard Sword': [[2,6, 'physical'], [2,6, 'divine'], [2,6, 'magical'], [2,6, 'negative'], [1, 6, 'sneak']], # None
   'Two-Bladed Sword': [[2,12, 'physical'],[2,6, 'positive'],[2,6, 'negative'], [2,8, 'massive']], # +3 AC, on hit doom
   'Double Axe': [[7,6, 'physical'],[1,12, 'negative'], [0,10, 'massive']], # Wounding, vamp regen
   'Katana': [[2,12, 'physical'],[2,6, 'divine'],[2,8, 'sonic'], [1,6, 'massive']], # level drain on hit
