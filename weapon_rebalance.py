@@ -162,6 +162,8 @@ def calculate_damage(weapon, properties, include_critical = False, is_keen = Fal
     weapon = weapons[weapon]
     sneak_damage = 0
     damage = (10 + weapon['base_damage']) * damage_type_weights['physical']
+    if weapon_name == 'Arrows' or weapon_name == "Bolts":
+      damage = 0
     # Off by 1 for greatersword. 7 * 2 - 1 = 13 not 12 :(
     potential = 10 + (weapon['base_damage'] * 2) -1
     if include_critical and crit_immune:
@@ -263,8 +265,8 @@ new_purple_weapons = {
   'Heavy Flail': [[2,10, 'physical'],[2,6, 'negative'],[2,6, 'divine'], [2,6, 'magical']], # None
   'Greataxe': [[2,12, 'physical'], [2,8, 'divine'], [2,12, 'fire']], # vs Undead, immune level drain
   'Ahrimans Halberd of Sacrifice': [[2,6, 'sneak'], [2,12, 'physical'], [0,200, 'massive']], # Ahrim's Sacrifice, hold on hit, 43
-  'Greatsword': [[2,12, 'physical'], [2,8, 'divine'], [2,8, 'fire'], [2,12, 'massive']], # deserts light
-  #'Greatsword': [[2,12, 'physical'], [2,12, 'divine'], [2,6, 'fire']], # tyr 48, lesser 54/58
+  #'Greatsword': [[2,12, 'physical'], [2,8, 'divine'], [2,8, 'fire'], [2,12, 'massive']], # deserts light
+  'Greatsword': [[2,12, 'physical'], [2,12, 'divine'], [2,6, 'fire']], # tyr 48, lesser 54/58
   'Dire Mace': [[8,6, 'physical'],[2,6, 'magical']], # 10% phys immune
   'Club': [[2,10, 'physical'],[7,6, 'acid']], # acid resist 20, immune level drain
   'Morningstar': [[2,6, 'physical'],[7,6, 'positive'], [1,6, 'massive']], # divine extend, 15% pos immune
@@ -277,8 +279,8 @@ new_purple_weapons = {
   'Double Axe': [[7,6, 'physical'],[1,12, 'negative'], [0,10, 'massive']], # Wounding, vamp regen
   'Katana': [[2,12, 'physical'],[2,6, 'divine'],[2,8, 'sonic'], [1,6, 'massive']], # level drain on hit
   'Longsword': [[2,8, 'physical'],[2,12, 'cold'],[2,6, 'magical']], # Icy Veng, immune death magic
-  'Arrows': [[2,12, 'physical'],[2,8, 'negative'],[1,12, 'magical']], #
-  'Bolts': [[2,12, 'physical'],[2,8, 'acid'],[1,12, 'magical']], #
+  'Arrows': [[2,12, 'physical'],[2,10, 'negative'],[2,8, 'magical'], [2, 6, 'fire']], #
+  'Bolts': [[2,12, 'physical'],[2,10, 'acid'],[2,8, 'magical'], [2, 6, 'fire']], #
   #'Gloves': [[2,8, 'physical'],[2,6, 'pure'],[2,8, 'divine']], # 
   'Gloves': [[2,4, 'physical'],[2,6, 'acid'],[2,6, 'magical'],[2,6, 'divine']], # doom
   'Battleaxe': [[2,8, 'physical'],[2,8, 'magical'], [2,8, 'negative']], # divine resist 5/ 5% immune
@@ -296,10 +298,10 @@ new_purple_weapons = {
   #'Shortsword': [[2,6, 'physical'],[2,6, 'acid'], [2,6, 'negative'], [2,12, 'massive']], # regen/vampiric
   'Shortsword': [[2,6, 'physical'],[2,6, 'sonic'], [2,6, 'pure'], [1, 6, 'sneak']],
   'Dagger': [[2,6, 'physical'],[2,4, 'divine'],[2,4, 'acid'], [2,4, 'pure']], # none
-  'Phase Killer': [[2,6, 'physical'],[2,6, 'negative'], [0,60, 'massive']],
+  'Phase Killer': [[2,6, 'physical'],[2,6, 'negative'], [0,80, 'massive']],
   'Shuriken': [[2,6, 'physical'], [2,6, 'sneak'], [2,4, 'negative'], [2,4, 'pure']], # none
   'Kama': [[2,6, 'physical'],[2,6, 'divine'],[2,6, 'positive'], [1,6, 'massive']], # 4 regen
-  'Kukri': [[2,6, 'physical'],[2,6, 'divine'],[2,6, 'magical']] # dmg vs alignment
+  'Kukri': [[2,6, 'physical'],[2,6, 'divine'],[2,6, 'magical'], [1, 4, 'positive']] # dmg vs alignment
 }
 new_purple_weapons_property = {
   'Trident': [[2,12, 'physical'],[2,12, 'cold'], [2,10, 'magical'], [1,10, 'massive']], # Icy veng
@@ -320,7 +322,8 @@ new_purple_weapons_property = {
   'Bastard Sword': [[2,6, 'physical'], [2,6, 'divine'], [2,6, 'magical'], [2,6, 'negative'], [1, 6, 'sneak']], # None
   'Two-Bladed Sword': [[2,12, 'physical'],[2,6, 'positive'],[2,6, 'negative'], [2,8, 'massive']], # +3 AC, on hit doom
   'Double Axe': [[7,6, 'physical'],[1,12, 'negative'], [0,10, 'massive']], # Wounding, vamp regen
-  'Katana': [[2,12, 'physical'],[2,6, 'divine'],[2,8, 'sonic'], [0, 1.05, 'fire']], # level drain on hit
+  # 'Katana': [[2,12, 'physical'],[2,6, 'divine'],[2,8, 'sonic'], [0, 1.05, 'fire']], # level drain on hit
+  'Katana': [[7,6, 'physical']], # level drain on hit
   'Longsword': [[2,8, 'physical'],[2,12, 'cold'],[2,6, 'magical']], # Icy Veng, immune death magic
   'Arrows': [[2,12, 'physical'],[2,8, 'negative'],[1,12, 'magical']], #
   'Bolts': [[2,12, 'physical'],[2,8, 'acid'],[1,12, 'magical']], #
